@@ -1,6 +1,6 @@
 package net.starlegacy.feature.starship.hyperspace
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.kyori.adventure.text.TextComponent
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import org.bukkit.Location
 import org.bukkit.util.Vector
@@ -32,7 +32,7 @@ class HyperspaceMarker(val org: Location, var ship: ActiveStarship, val dest: Lo
 
 	/** Id of the marker to use in adding or removing markers in the render
 	 * currently player name*/
-	var id = ((ship as ActivePlayerStarship).pilot?.name() as TextComponent).content()
+	var id = ((ship as ActiveEntityStarship).pilot?.name() as TextComponent).content()
 
 	private var seconds = 0
 

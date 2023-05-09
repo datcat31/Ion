@@ -12,6 +12,7 @@ import net.horizonsend.ion.common.extensions.success
 import net.horizonsend.ion.common.extensions.successActionMessage
 import net.horizonsend.ion.common.extensions.userError
 import net.horizonsend.ion.common.extensions.userErrorActionMessage
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.starlegacy.cache.nations.PlayerCache
 import net.starlegacy.command.SLCommand
@@ -23,7 +24,6 @@ import net.starlegacy.feature.starship.PilotedStarships
 import net.starlegacy.feature.starship.PilotedStarships.getDisplayName
 import net.starlegacy.feature.starship.StarshipDestruction
 import net.starlegacy.feature.starship.StarshipType
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarships
 import net.starlegacy.feature.starship.control.StarshipControl
 import net.starlegacy.feature.starship.control.StarshipCruising
@@ -72,7 +72,7 @@ object MiscStarshipCommands : SLCommand() {
 	fun onStopRiding(sender: Player) {
 		val starship = getStarshipRiding(sender)
 
-		failIf(starship is ActivePlayerStarship && starship.pilot == sender) {
+		failIf(starship is ActiveEntityStarship && starship.pilot == sender) {
 			"You can't stop riding if you're the pilot. Use /release or /unpilot."
 		}
 
@@ -111,7 +111,7 @@ object MiscStarshipCommands : SLCommand() {
 	@CommandAlias("jump")
 	@CommandCompletion("x|z")
 	fun onJump(sender: Player, xCoordinate: String, zCoordinate: String, @Optional hyperdriveTier: Int?) {
-		val starship: ActivePlayerStarship = getStarshipPiloting(sender)
+		val starship: ActiveEntityStarship = getStarshipPiloting(sender)
 
 		val navComp: NavCompSubsystem = Hyperspace.findNavComp(starship) ?: fail { "Intact nav computer not found!" }
 		val maxRange: Int =
@@ -135,7 +135,7 @@ object MiscStarshipCommands : SLCommand() {
 	@CommandAlias("jump")
 	@CommandCompletion("@planets")
 	fun onJump(sender: Player, planet: String, @Optional hyperdriveTier: Int?) {
-		val starship: ActivePlayerStarship = getStarshipPiloting(sender)
+		val starship: ActiveEntityStarship = getStarshipPiloting(sender)
 
 		val navComp: NavCompSubsystem = Hyperspace.findNavComp(starship) ?: fail { "Intact nav computer not found!" }
 		val maxRange: Int =
@@ -160,7 +160,7 @@ object MiscStarshipCommands : SLCommand() {
 	}
 
 	private fun tryJump(
-		starship: ActivePlayerStarship,
+		starship: ActiveEntityStarship,
 		x: Int,
 		z: Int,
 		destinationWorld: World,
@@ -342,7 +342,7 @@ object MiscStarshipCommands : SLCommand() {
 	@CommandAlias("nukeship")
 	@CommandPermission("starships.nukeship")
 	fun onNukeShip(sender: Player) {
-		val ship = getStarshipRiding(sender) as? ActivePlayerStarship ?: return
+		val ship = getStarshipRiding(sender) as? ActiveEntityStarship ?: return
 		StarshipDestruction.vanish(ship)
 	}
 
@@ -421,13 +421,13 @@ object MiscStarshipCommands : SLCommand() {
 		var totalBlocks = 0
 
 		for (starship in ActiveStarships.all()) {
-			val pilot: Player? = (starship as? ActivePlayerStarship)?.pilot
+			val pilot: Player? = (starship as? ActiveEntityStarship)?.pilot
 			totalShips++
 
 			val size: Int = starship.initialBlockCount
 			totalBlocks += size
 
-			val name = (starship as? ActivePlayerStarship)?.data?.let { getDisplayName(it) } ?: starship.type.formatted
+			val name = (starship as? ActiveEntityStarship)?.data?.let { getDisplayName(it) } ?: starship.type.formatted
 			val hoverName = MiniMessage.miniMessage().deserialize(starship.type.formatted).asHoverEvent()
 
 			val pilotName = pilot?.name ?: "none"
@@ -470,7 +470,7 @@ object MiscStarshipCommands : SLCommand() {
 	@Suppress("unused")
 	@CommandAlias("usebeacon")
 	fun onUseBeacon(sender: Player) {
-		val ship = getStarshipRiding(sender) as? ActivePlayerStarship ?: return
+		val ship = getStarshipRiding(sender) as? ActiveEntityStarship ?: return
 
 		if (ship.beacon != null) {
 			val other = ship.beacon!!.exits?.randomOrNull() ?: ship.beacon!!.destination

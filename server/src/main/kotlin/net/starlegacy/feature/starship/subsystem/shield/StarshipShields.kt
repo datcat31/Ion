@@ -2,6 +2,7 @@ package net.starlegacy.feature.starship.subsystem.shield
 
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import net.horizonsend.ion.server.IonServer
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.horizonsend.ion.server.miscellaneous.minecraft
 import net.minecraft.core.BlockPos
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket
@@ -13,7 +14,6 @@ import net.starlegacy.feature.multiblock.Multiblocks
 import net.starlegacy.feature.multiblock.particleshield.BoxShieldMultiblock
 import net.starlegacy.feature.multiblock.particleshield.ShieldMultiblock
 import net.starlegacy.feature.multiblock.particleshield.SphereShieldMultiblock
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.active.ActiveStarships
 import net.starlegacy.feature.starship.event.StarshipActivatedEvent
@@ -138,14 +138,14 @@ object StarshipShields : SLComponent() {
 		val iterator = updatedStarships.iterator()
 		while (iterator.hasNext()) {
 			val ship = iterator.next()
-			if (ship is ActivePlayerStarship) {
+			if (ship is ActiveEntityStarship) {
 				updateShieldBars(ship)
 			}
 		}
 	}
 
 	@Synchronized
-	fun updateShieldBars(ship: ActivePlayerStarship) {
+	fun updateShieldBars(ship: ActiveEntityStarship) {
 		for ((name, bossBar) in ship.shieldBars) {
 			var amount = 0
 			var total = 0.0

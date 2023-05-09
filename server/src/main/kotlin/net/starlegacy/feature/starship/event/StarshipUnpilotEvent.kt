@@ -1,14 +1,14 @@
 package net.starlegacy.feature.starship.event
 
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import org.bukkit.event.HandlerList
 
 class StarshipUnpilotEvent(
-	ship: ActivePlayerStarship,
+	ship: ActiveEntityStarship,
 	val player: Player
-) : PlayerStarshipEvent(ship), Cancellable {
+) : EntityStarshipEvent(ship), Cancellable {
 	private var cancelled: Boolean = false
 
 	override fun getHandlers(): HandlerList {

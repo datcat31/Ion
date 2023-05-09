@@ -1,17 +1,19 @@
-package net.starlegacy.feature.starship.active
+package net.horizonsend.ion.server.features.starship.active
 
 import co.aikar.commands.ConditionFailedException
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import net.horizonsend.ion.server.configuration.ServerConfiguration
+import net.horizonsend.ion.server.database.schema.starships.StarshipData
 import net.horizonsend.ion.server.features.starship.controllers.LegacyController
 import net.horizonsend.ion.server.features.starship.controllers.PlayerController
 import net.horizonsend.ion.server.miscellaneous.minecraft
 import net.minecraft.core.BlockPos
 import net.starlegacy.cache.nations.NationCache
 import net.starlegacy.cache.nations.PlayerCache
-import net.starlegacy.database.Oid
-import net.starlegacy.database.schema.starships.PlayerStarshipData
 import net.starlegacy.feature.starship.StarshipType
+import net.starlegacy.feature.starship.active.ActiveStarship
+import net.starlegacy.feature.starship.active.ActiveStarshipHitbox
+import net.starlegacy.feature.starship.active.ActiveStarships
 import net.starlegacy.feature.starship.control.StarshipControl
 import net.starlegacy.feature.starship.control.StarshipCruising
 import net.starlegacy.feature.starship.event.StarshipMoveEvent
@@ -31,20 +33,21 @@ import org.bukkit.block.BlockFace
 import org.bukkit.boss.BossBar
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector
+import org.litote.kmongo.Id
 import java.lang.Math.cbrt
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
-class ActivePlayerStarship(
-	val data: PlayerStarshipData,
+class ActiveEntityStarship(
+	val data: StarshipData,
 	blocks: LongOpenHashSet,
 	mass: Double,
 	centerOfMass: BlockPos,
 	hitbox: ActiveStarshipHitbox,
 	// map of carried ship to its blocks
-	carriedShips: Map<PlayerStarshipData, LongOpenHashSet>
+	carriedShips: Map<StarshipData, LongOpenHashSet>
 ) : ActiveStarship(
 	data.bukkitWorld().minecraft,
 	blocks,
@@ -52,7 +55,7 @@ class ActivePlayerStarship(
 	centerOfMass,
 	hitbox
 ) {
-	val carriedShips: MutableMap<PlayerStarshipData, LongOpenHashSet> = carriedShips.toMutableMap()
+	val carriedShips: MutableMap<StarshipData, LongOpenHashSet> = carriedShips.toMutableMap()
 	override val type: StarshipType = data.starshipType
 	override val interdictionRange: Int = data.starshipType.interdictionRange
 
@@ -115,7 +118,7 @@ class ActivePlayerStarship(
 		}
 	}
 
-	override fun moveAsync(movement: StarshipMovement): CompletableFuture<Boolean> {
+	override fun moveAsync(movement: StarshipMovement<Any?>): CompletableFuture<Boolean> {
 		if (!ActiveStarships.isActive(this)) {
 			return CompletableFuture.completedFuture(false)
 		}
@@ -143,7 +146,7 @@ class ActivePlayerStarship(
 	}
 
 	@Synchronized
-	private fun executeMovement(movement: StarshipMovement, pilot: Player?): Boolean {
+	private fun executeMovement(movement: StarshipMovement<Any?>, pilot: Player?): Boolean {
 		try {
 			movement.execute()
 		} catch (e: ConditionFailedException) {
@@ -155,7 +158,7 @@ class ActivePlayerStarship(
 		return true
 	}
 
-	val dataId: Oid<PlayerStarshipData> = data._id
+	val dataId: Id<StarshipData> = data._id
 
 	// manual move is sneak/direct control
 	val manualMoveCooldownMillis: Long = (cbrt(initialBlockCount.toDouble()) * 40).toLong()
@@ -213,5 +216,13 @@ class ActivePlayerStarship(
 			}
 		}
 		super.clearPassengers()
+	}
+	fun isPilot(pCheck: Player): Boolean {
+		if (data.isNpc == false){
+			if(pilot == pCheck) {
+				return true
+			}
+		}
+		return false
 	}
 }

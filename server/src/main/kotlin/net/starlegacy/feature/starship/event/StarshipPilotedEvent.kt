@@ -1,10 +1,10 @@
 package net.starlegacy.feature.starship.event
 
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 
-class StarshipPilotedEvent(ship: ActivePlayerStarship, val player: Player) : PlayerStarshipEvent(ship) {
+class StarshipPilotedEvent(ship: ActiveEntityStarship, val player: Player) : EntityStarshipEvent(ship) {
 	override fun getHandlers(): HandlerList {
 		return handlerList
 	}

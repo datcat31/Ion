@@ -3,10 +3,10 @@ package net.starlegacy.feature.starship.control
 import net.horizonsend.ion.common.extensions.information
 import net.horizonsend.ion.common.extensions.informationAction
 import net.horizonsend.ion.common.extensions.userErrorAction
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.starlegacy.SLComponent
 import net.starlegacy.feature.starship.PilotedStarships
 import net.starlegacy.feature.starship.StarshipType.PLATFORM
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarships
 import net.starlegacy.feature.starship.event.StarshipStartCruisingEvent
 import net.starlegacy.feature.starship.event.StarshipStopCruisingEvent
@@ -24,7 +24,7 @@ object StarshipCruising : SLComponent() {
 	const val SECONDS_PER_CRUISE = 2.0
 
 	class CruiseData(
-		starship: ActivePlayerStarship,
+		starship: ActiveEntityStarship,
 		var velocity: Vector = Vector(),
 		var targetSpeed: Int = 0,
 		var targetDir: Vector? = null,
@@ -77,7 +77,7 @@ object StarshipCruising : SLComponent() {
 		}
 	}
 
-	private fun updateCruisingShip(starship: ActivePlayerStarship) {
+	private fun updateCruisingShip(starship: ActiveEntityStarship) {
 		processUpdatedHullIntegrity(starship)
 
 		val oldVelocity = starship.cruiseData.velocity.clone()
@@ -121,7 +121,7 @@ object StarshipCruising : SLComponent() {
 		TranslateMovement.loadChunksAndMove(starship, dx, dy, dz)
 	}
 
-	private fun processUpdatedHullIntegrity(starship: ActivePlayerStarship) {
+	private fun processUpdatedHullIntegrity(starship: ActiveEntityStarship) {
 		val oldBlockCount = starship.cruiseData.lastBlockCount
 		val newBlockCount = starship.initialBlockCount
 
@@ -132,7 +132,7 @@ object StarshipCruising : SLComponent() {
 		starship.generateThrusterMap()
 	}
 
-	private fun shouldStopCruising(starship: ActivePlayerStarship): Boolean {
+	private fun shouldStopCruising(starship: ActiveEntityStarship): Boolean {
 		if (starship.isDirectControlEnabled) {
 			return true
 		}
@@ -144,7 +144,7 @@ object StarshipCruising : SLComponent() {
 		return false
 	}
 
-	fun startCruising(player: Player, starship: ActivePlayerStarship) {
+	fun startCruising(player: Player, starship: ActiveEntityStarship) {
 		if (starship.type == PLATFORM) {
 			player.userErrorAction("This ship type is not capable of moving.")
 			return
@@ -195,7 +195,7 @@ object StarshipCruising : SLComponent() {
 		}
 	}
 
-	fun stopCruising(player: Player, starship: ActivePlayerStarship) {
+	fun stopCruising(player: Player, starship: ActiveEntityStarship) {
 		if (starship.type == PLATFORM) {
 			player.userErrorAction("This ship type is not capable of moving.")
 			return
@@ -223,9 +223,9 @@ object StarshipCruising : SLComponent() {
 		}
 	}
 
-	fun forceStopCruising(starship: ActivePlayerStarship) {
+	fun forceStopCruising(starship: ActiveEntityStarship) {
 		starship.cruiseData = CruiseData(starship)
 	}
 
-	fun isCruising(starship: ActivePlayerStarship) = starship.cruiseData.targetDir != null
+	fun isCruising(starship: ActiveEntityStarship) = starship.cruiseData.targetDir != null
 }

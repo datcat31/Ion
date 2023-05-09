@@ -1,5 +1,6 @@
 package net.starlegacy.feature.starship.active
 
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.starlegacy.feature.misc.CryoPods
 import net.starlegacy.feature.multiblock.Multiblocks
 import net.starlegacy.feature.multiblock.drills.DrillMultiblock
@@ -35,7 +36,7 @@ import java.util.LinkedList
 import java.util.Locale
 
 object SubsystemDetector {
-	fun detectSubsystems(starship: ActivePlayerStarship) {
+	fun detectSubsystems(starship: ActiveEntityStarship) {
 		// these has to be queued for after the loop so things like the bounds are detected first,
 		// and so they are detected in the right order, e.g. weapons before weapon sets/signs
 		val potentialThrusterBlocks = LinkedList<Block>()
@@ -72,7 +73,7 @@ object SubsystemDetector {
 		filterSubsystems(starship)
 	}
 
-	private fun detectSign(starship: ActivePlayerStarship, block: Block) {
+	private fun detectSign(starship: ActiveEntityStarship, block: Block) {
 		val sign = block.state as Sign
 
 		if (sign.type.isWallSign && sign.getLine(0).lowercase(Locale.getDefault()).contains("node")) {
@@ -131,7 +132,7 @@ object SubsystemDetector {
 		}
 	}
 
-	private fun detectThruster(starship: ActivePlayerStarship, block: Block) {
+	private fun detectThruster(starship: ActiveEntityStarship, block: Block) {
 		for (face in CARDINAL_BLOCK_FACES) {
 			val thrusterType: ThrusterType = ThrusterType.values()
 				.firstOrNull { it.matchesStructure(starship, block.x, block.y, block.z, face) }
@@ -141,7 +142,7 @@ object SubsystemDetector {
 		}
 	}
 
-	private fun detectWeapon(starship: ActivePlayerStarship, block: Block) {
+	private fun detectWeapon(starship: ActiveEntityStarship, block: Block) {
 		for (face: BlockFace in CARDINAL_BLOCK_FACES) {
 			val multiblock = getWeaponMultiblock(block, face) ?: continue
 
@@ -157,7 +158,7 @@ object SubsystemDetector {
 		}
 	}
 
-	private fun isDuplicate(starship: ActivePlayerStarship, subsystem: WeaponSubsystem): Boolean {
+	private fun isDuplicate(starship: ActiveEntityStarship, subsystem: WeaponSubsystem): Boolean {
 		return subsystem is DirectionalSubsystem && starship.subsystems
 			.filterIsInstance<WeaponSubsystem>()
 			.filter { it.pos == subsystem.pos }
@@ -195,7 +196,7 @@ object SubsystemDetector {
 			.firstOrNull { it.blockMatchesStructure(block, face) }
 	}
 
-	private fun filterSubsystems(starship: ActivePlayerStarship) {
+	private fun filterSubsystems(starship: ActiveEntityStarship) {
 		starship.subsystems.filterIsInstanceTo(starship.shields)
 		starship.subsystems.filterIsInstanceTo(starship.weapons)
 		starship.subsystems.filterIsInstanceTo(starship.turrets)

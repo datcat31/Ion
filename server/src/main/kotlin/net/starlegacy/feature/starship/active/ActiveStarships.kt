@@ -8,7 +8,8 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import net.starlegacy.SLComponent
 import net.starlegacy.database.Oid
-import net.starlegacy.database.schema.starships.PlayerStarshipData
+import net.horizonsend.ion.server.database.schema.starships.StarshipData
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.starlegacy.feature.starship.PilotedStarships
 import net.starlegacy.feature.starship.StarshipDestruction
 import net.starlegacy.feature.starship.StarshipType.SPEEDER
@@ -30,8 +31,8 @@ import kotlin.collections.set
 
 object ActiveStarships : SLComponent() {
 	private val set = ObjectOpenHashSet<ActiveStarship>()
-	private val playerShipIdMap = Object2ObjectOpenHashMap<Oid<PlayerStarshipData>, ActivePlayerStarship>()
-	private val playerShipLocationMap: LoadingCache<World, Long2ObjectOpenHashMap<PlayerStarshipData>> = CacheBuilder
+	private val playerShipIdMap = Object2ObjectOpenHashMap<Oid<StarshipData>, ActiveEntityStarship>()
+	private val playerShipLocationMap: LoadingCache<World, Long2ObjectOpenHashMap<StarshipData>> = CacheBuilder
 		.newBuilder()
 		.weakKeys()
 		.build(CacheLoader.from { w -> Long2ObjectOpenHashMap() })
@@ -42,23 +43,23 @@ object ActiveStarships : SLComponent() {
 
 	fun all(): List<ActiveStarship> = set.toList()
 
-	fun allPlayerShips(): List<ActivePlayerStarship> = playerShipIdMap.values.toList()
+	fun allPlayerShips(): List<ActiveEntityStarship> = playerShipIdMap.values.toList()
 
 	fun add(starship: ActiveStarship) {
 		Tasks.checkMainThread()
 		val world = starship.serverLevel.world
 
-		require(starship !is ActivePlayerStarship || !playerShipIdMap.containsKey(starship.dataId)) {
+		require(starship !is ActiveEntityStarship || !playerShipIdMap.containsKey(starship.dataId)) {
 			"Starship is already in the active id map"
 		}
-		require(starship !is ActivePlayerStarship || !playerShipLocationMap[world].containsKey(starship.data.blockKey)) {
+		require(starship !is ActiveEntityStarship || !playerShipLocationMap[world].containsKey(starship.data.blockKey)) {
 			"Another starship is already at that location"
 		}
 
 		set.add(starship)
 
-		if (starship is ActivePlayerStarship) {
-			playerShipIdMap[starship.dataId] = starship
+		if (starship is ActiveEntityStarship) {
+			playerShipIdMap[starship.dataId as Oid<StarshipData>?] = starship
 			playerShipLocationMap[world][starship.data.blockKey] = starship.data
 		}
 
@@ -82,10 +83,10 @@ object ActiveStarships : SLComponent() {
 
 		set.remove(starship)
 
-		if (starship is ActivePlayerStarship) {
+		if (starship is ActiveEntityStarship) {
 			playerShipIdMap.remove(starship.dataId)
 			val blockKey: Long = starship.data.blockKey
-			val data: PlayerStarshipData = starship.data
+			val data: StarshipData = starship.data
 			playerShipLocationMap[starship.serverLevel.world].remove(blockKey, data as Any)
 		}
 
@@ -100,7 +101,7 @@ object ActiveStarships : SLComponent() {
 		starship.destroy()
 	}
 
-	fun updateLocation(playerStarshipData: PlayerStarshipData, newWorld: World, newKey: Long) {
+	fun updateLocation(playerStarshipData: StarshipData, newWorld: World, newKey: Long) {
 		Tasks.checkMainThread()
 
 		val oldKey = playerStarshipData.blockKey
@@ -109,8 +110,8 @@ object ActiveStarships : SLComponent() {
 		}
 
 		val oldWorld: World = playerStarshipData.bukkitWorld()
-		val oldMap: Long2ObjectOpenHashMap<PlayerStarshipData> = playerShipLocationMap[oldWorld]
-		val newMap: Long2ObjectOpenHashMap<PlayerStarshipData> = playerShipLocationMap[newWorld]
+		val oldMap: Long2ObjectOpenHashMap<StarshipData> = playerShipLocationMap[oldWorld]
+		val newMap: Long2ObjectOpenHashMap<StarshipData> = playerShipLocationMap[newWorld]
 
 		val notYetInNewWorld = !newMap.containsKey(newKey)
 		val successfullyRemoved = oldMap.remove(oldKey, playerStarshipData as Any)
@@ -132,9 +133,9 @@ object ActiveStarships : SLComponent() {
 		if (starship.type == SPEEDER && newWorld.name == "Space") StarshipDestruction.destroy(starship)
 	}
 
-	operator fun get(playerShipId: Oid<PlayerStarshipData>) = playerShipIdMap[playerShipId]
+	operator fun get(playerShipId: Oid<StarshipData>) = playerShipIdMap[playerShipId]
 
-	fun getByComputerLocation(world: World, x: Int, y: Int, z: Int): PlayerStarshipData? {
+	fun getByComputerLocation(world: World, x: Int, y: Int, z: Int): StarshipData? {
 		return playerShipLocationMap[world][blockKey(x, y, z)]
 	}
 
@@ -142,7 +143,7 @@ object ActiveStarships : SLComponent() {
 
 	fun findByPassenger(player: Player): ActiveStarship? = set.firstOrNull { it.isPassenger(player.uniqueId) }
 
-	fun findByPilot(player: Player): ActivePlayerStarship? = PilotedStarships[player]
+	fun findByPilot(player: Player): ActiveEntityStarship? = PilotedStarships[player]
 
 	fun findByBlock(block: Block): ActiveStarship? {
 		return findByBlock(block.world, block.x, block.y, block.z)

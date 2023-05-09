@@ -1,10 +1,10 @@
 package net.starlegacy.feature.starship.movement
 
 import io.papermc.paper.entity.TeleportFlag
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.minecraft.world.level.block.Rotation
 import net.minecraft.world.level.block.state.BlockState
 import net.starlegacy.feature.misc.CustomBlocks
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.subsystem.DirectionalSubsystem
 import net.starlegacy.feature.starship.subsystem.thruster.ThrustData
@@ -18,7 +18,7 @@ import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
-class RotationMovement(starship: ActiveStarship, val clockwise: Boolean) : StarshipMovement(starship) {
+class RotationMovement(starship: ActiveStarship, val clockwise: Boolean) : StarshipMovement<Any?>(starship) {
 	private val origin get() = starship.centerOfMass
 	private val nmsRotation = if (clockwise) Rotation.CLOCKWISE_90 else Rotation.COUNTERCLOCKWISE_90
 	private val theta: Double = if (clockwise) 90.0 else -90.0
@@ -109,7 +109,7 @@ class RotationMovement(starship: ActiveStarship, val clockwise: Boolean) : Stars
 
 		starship.forward = rotateBlockFace(starship.forward)
 
-		if (starship is ActivePlayerStarship) {
+		if (starship is ActiveEntityStarship) {
 			val dir = starship.cruiseData.targetDir
 			if (dir != null) {
 				val newX = dir.x * cosTheta - dir.z * sinTheta

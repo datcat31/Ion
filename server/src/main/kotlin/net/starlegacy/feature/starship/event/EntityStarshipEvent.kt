@@ -1,10 +1,10 @@
 package net.starlegacy.feature.starship.event
 
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.horizonsend.ion.server.legacy.NewPlayerProtection.updateProtection
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 
-abstract class PlayerStarshipEvent(
-	override val starship: ActivePlayerStarship
+abstract class EntityStarshipEvent(
+	override val starship: ActiveEntityStarship
 ) : StarshipEvent(starship) {
 	init {
 		starship.pilot?.player?.updateProtection()

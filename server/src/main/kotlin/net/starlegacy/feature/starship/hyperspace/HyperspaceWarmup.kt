@@ -4,9 +4,9 @@ import net.horizonsend.ion.common.extensions.alertAction
 import net.horizonsend.ion.common.extensions.informationAction
 import net.horizonsend.ion.common.extensions.userErrorAction
 import net.horizonsend.ion.server.IonServer
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.starlegacy.cache.nations.PlayerCache
 import net.starlegacy.database.schema.nations.CapturableStation
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.subsystem.HyperdriveSubsystem
 import org.bukkit.Location
@@ -24,7 +24,7 @@ class HyperspaceWarmup(
 ) :
 	BukkitRunnable() {
 	init {
-		if (ship is ActivePlayerStarship) {
+		if (ship is ActiveEntityStarship) {
 			warmup -= (
 				max(
 					min(

@@ -3,6 +3,7 @@ package net.starlegacy.feature.starship
 import net.horizonsend.ion.common.extensions.alert
 import net.horizonsend.ion.common.extensions.success
 import net.horizonsend.ion.common.extensions.userError
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.sound.Sound
 import net.starlegacy.SLComponent
@@ -10,7 +11,6 @@ import net.starlegacy.feature.misc.CustomItems
 import net.starlegacy.feature.multiblock.Multiblocks
 import net.starlegacy.feature.multiblock.gravitywell.GravityWellMultiblock
 import net.starlegacy.feature.space.SpaceWorlds
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.active.ActiveStarships
 import net.starlegacy.feature.starship.control.StarshipCruising
@@ -117,7 +117,7 @@ object Interdiction : SLComponent() {
 		}
 
 		for (cruisingShip in ActiveStarships.getInWorld(world)) {
-			if (cruisingShip !is ActivePlayerStarship) {
+			if (cruisingShip !is ActiveEntityStarship) {
 				continue
 			}
 

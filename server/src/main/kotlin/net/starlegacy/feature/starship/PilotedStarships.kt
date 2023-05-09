@@ -14,8 +14,8 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import net.starlegacy.SLComponent
 import net.starlegacy.database.schema.misc.SLPlayer
 import net.starlegacy.database.schema.starships.Blueprint
-import net.starlegacy.database.schema.starships.PlayerStarshipData
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
+import net.horizonsend.ion.server.database.schema.starships.StarshipData
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.starlegacy.feature.starship.active.ActiveStarships
 import net.starlegacy.feature.starship.event.StarshipPilotEvent
 import net.starlegacy.feature.starship.event.StarshipPilotedEvent
@@ -46,7 +46,7 @@ import kotlin.collections.component2
 import kotlin.collections.set
 
 object PilotedStarships : SLComponent() {
-	internal val map = mutableMapOf<Player, ActivePlayerStarship>()
+	internal val map = mutableMapOf<Player, ActiveEntityStarship>()
 
 	override fun onEnable() {
 		listen<PlayerQuitEvent> { event ->
@@ -54,7 +54,7 @@ object PilotedStarships : SLComponent() {
 		}
 	}
 
-	fun pilot(starship: ActivePlayerStarship, player: Player) {
+	fun pilot(starship: ActiveEntityStarship, player: Player) {
 		Tasks.checkMainThread()
 		check(!starship.isExploding)
 		check(!map.containsKey(player)) { "${player.name} is already piloting a starship" }
@@ -75,7 +75,7 @@ object PilotedStarships : SLComponent() {
 		ActiveStarships.findByPassenger(player)?.removePassenger(player.uniqueId)
 	}
 
-	private fun setupPassengers(starship: ActivePlayerStarship) {
+	private fun setupPassengers(starship: ActiveEntityStarship) {
 		starship.addPassenger(starship.requirePilot().uniqueId)
 		for (otherPlayer in starship.serverLevel.world.players) {
 			if (!starship.isWithinHitbox(otherPlayer)) {
@@ -88,7 +88,7 @@ object PilotedStarships : SLComponent() {
 		}
 	}
 
-	private fun setupShieldDisplayIndicators(starship: ActivePlayerStarship) {
+	private fun setupShieldDisplayIndicators(starship: ActiveEntityStarship) {
 		starship.shields.map(ShieldSubsystem::name).distinct().associateWithTo(starship.shieldBars) { name: String ->
 			// create the actual boss bar
 			val bar: BossBar = Bukkit.createBossBar(name, BarColor.GREEN, BarStyle.SEGMENTED_10)
@@ -99,7 +99,7 @@ object PilotedStarships : SLComponent() {
 		}
 	}
 
-	private fun saveLoadshipData(starship: ActivePlayerStarship, player: Player) {
+	private fun saveLoadshipData(starship: ActiveEntityStarship, player: Player) {
 		val schematic = StarshipSchematic.createSchematic(starship)
 
 		val key =
@@ -112,7 +112,7 @@ object PilotedStarships : SLComponent() {
 		}
 	}
 
-	private fun removeExtractors(starship: ActivePlayerStarship) {
+	private fun removeExtractors(starship: ActiveEntityStarship) {
 		starship.iterateBlocks { x, y, z ->
 			if (starship.serverLevel.world.getBlockAt(x, y, z).type == Material.CRAFTING_TABLE) {
 				Extractors.remove(starship.serverLevel.world, Vec3i(x, y, z))
@@ -120,11 +120,11 @@ object PilotedStarships : SLComponent() {
 		}
 	}
 
-	fun isPiloted(starship: ActivePlayerStarship): Boolean {
+	fun isPiloted(starship: ActiveEntityStarship): Boolean {
 		return starship.pilot != null
 	}
 
-	fun unpilot(starship: ActivePlayerStarship, normal: Boolean = false) {
+	fun unpilot(starship: ActiveEntityStarship, normal: Boolean = false) {
 		Tasks.checkMainThread()
 		val player = starship.pilot ?: error("Starship $starship is not piloted")
 		if (normal) {
@@ -154,8 +154,8 @@ object PilotedStarships : SLComponent() {
 		StarshipUnpilotedEvent(starship, player).callEvent()
 	}
 
-	operator fun get(player: Player): ActivePlayerStarship? = map[player]
-	fun tryPilot(player: Player, data: PlayerStarshipData, callback: (ActivePlayerStarship) -> Unit = {}): Boolean {
+	operator fun get(player: Player): ActiveEntityStarship? = map[player]
+	fun tryPilot(player: Player, data: StarshipData, callback: (ActiveEntityStarship) -> Unit = {}): Boolean {
 		if (!data.isPilot(player)) {
 			val captain = SLPlayer.getName(data.captain) ?: "null, <red>something's gone wrong, please contact staff"
 
@@ -215,7 +215,7 @@ object PilotedStarships : SLComponent() {
 			nearbyPlayer.playSound(Sound.sound(Key.key("minecraft:block.beacon.activate"), Sound.Source.AMBIENT, 5f, 0.05f))
 		}
 
-		val carriedShips = mutableListOf<PlayerStarshipData>()
+		val carriedShips = mutableListOf<StarshipData>()
 
 		for ((key: Long, blockData: BlockData) in state.blockMap) {
 			val x: Int = blockKeyX(key)
@@ -299,7 +299,7 @@ object PilotedStarships : SLComponent() {
 		return true
 	}
 
-	fun tryRelease(starship: ActivePlayerStarship, player: Player): Boolean {
+	fun tryRelease(starship: ActiveEntityStarship, player: Player): Boolean {
 		if (!StarshipUnpilotEvent(starship, player).callEvent()) {
 			return false
 		}
@@ -314,15 +314,15 @@ object PilotedStarships : SLComponent() {
 		return true
 	}
 
-	fun getDisplayName(data: PlayerStarshipData): String {
+	fun getDisplayName(data: StarshipData): String {
 		return data.name ?: data.starshipType.formatted
 	}
 
-	fun getDisplayNameComponent(data: PlayerStarshipData): Component = data.name?.let {
+	fun getDisplayNameComponent(data: StarshipData): Component = data.name?.let {
 		MiniMessage.miniMessage().deserialize(it)
 	} ?: MiniMessage.miniMessage().deserialize(data.starshipType.formatted)
 
-	fun getRawDisplayName(data: PlayerStarshipData): String {
+	fun getRawDisplayName(data: StarshipData): String {
 		return (MiniMessage.miniMessage().deserialize(getDisplayName(data)) as TextComponent).content()
 	}
 }

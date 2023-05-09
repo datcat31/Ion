@@ -1,6 +1,6 @@
 package net.starlegacy.feature.starship.subsystem.reactor
 
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.subsystem.StarshipSubsystem
 import net.starlegacy.feature.starship.subsystem.shield.StarshipShields
@@ -47,7 +47,7 @@ class ReactorSubsystem(
 			shield.power += min(missing, fraction)
 		}
 
-		if (starship is ActivePlayerStarship) {
+		if (starship is ActiveEntityStarship) {
 			StarshipShields.updateShieldBars(starship)
 		}
 	}

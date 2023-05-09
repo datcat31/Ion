@@ -2,7 +2,7 @@ package net.starlegacy.feature.starship.movement
 
 import net.horizonsend.ion.common.extensions.information
 import net.horizonsend.ion.common.extensions.userError
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.control.StarshipCruising
 import net.starlegacy.util.Vec3i
@@ -19,7 +19,7 @@ object StarshipTeleportation {
 		val dy = y - origin.y
 		val dz = z - origin.z
 
-		if (starship is ActivePlayerStarship) {
+		if (starship is ActiveEntityStarship) {
 			StarshipCruising.forceStopCruising(starship)
 			starship.setDirectControlEnabled(false)
 		}

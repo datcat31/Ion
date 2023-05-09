@@ -1,7 +1,7 @@
 package net.starlegacy.feature.starship.subsystem.weapon
 
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.starlegacy.feature.multiblock.starshipweapon.turret.TurretMultiblock
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.subsystem.DirectionalSubsystem
 import net.starlegacy.feature.starship.subsystem.weapon.interfaces.AutoWeaponSubsystem
@@ -79,7 +79,7 @@ abstract class TurretWeaponSubsystem(
 	}
 
 	override fun autoFire(target: Player, dir: Vector) {
-		val shooter = (starship as? ActivePlayerStarship)?.pilot
+		val shooter = (starship as? ActiveEntityStarship)?.pilot
 		multiblock.shoot(starship.serverLevel.world, pos, face, dir, starship, shooter)
 	}
 }
