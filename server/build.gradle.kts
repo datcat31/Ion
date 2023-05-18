@@ -43,6 +43,9 @@ dependencies {
 	implementation("net.wesjd:anvilgui:1.6.3-SNAPSHOT")
 	implementation("org.litote.kmongo:kmongo:4.9.0")
 	implementation("io.github.skytasul:guardianbeam:2.3.2")
+
+	implementation("org.deeplearning4j:deeplearning4j-core:1.0.0-M2.1")
+	implementation("org.nd4j:nd4j-native-platform:1.0.0-M2.1")
 }
 
 tasks.reobfJar { outputJar.set(file(rootProject.projectDir.absolutePath + "/build/IonServer.jar")) }
