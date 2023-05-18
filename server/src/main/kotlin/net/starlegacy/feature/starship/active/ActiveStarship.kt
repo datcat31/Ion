@@ -287,7 +287,7 @@ abstract class ActiveStarship(
 		passengers.clear()
 	}
 
-	abstract fun moveAsync(movement: StarshipMovement): CompletableFuture<Boolean>
+	abstract fun moveAsync(movement: StarshipMovement<Any?>): CompletableFuture<Boolean>
 
 	@Deprecated("Deprecated in favour of Adventure text components.")
 	fun sendTitle(title: Title) {

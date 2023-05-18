@@ -17,7 +17,7 @@ import net.kyori.adventure.util.HSVLike
 import net.starlegacy.SLComponent
 import net.starlegacy.database.Oid
 import net.starlegacy.database.schema.misc.SLPlayer
-import net.starlegacy.database.schema.starships.PlayerStarshipData
+import net.horizonsend.ion.server.database.schema.starships.StarshipData
 import net.starlegacy.database.uuid
 import net.starlegacy.feature.nations.gui.playerClicker
 import net.starlegacy.feature.nations.gui.skullItem
@@ -53,7 +53,6 @@ import net.starlegacy.database.schema.nations.Territory
 import net.starlegacy.database.slPlayerId
 import net.starlegacy.feature.nations.region.Regions
 import net.starlegacy.feature.nations.region.types.RegionTerritory
-import net.starlegacy.listener.misc.ProtectionListener.isRegionDenied
 import org.litote.kmongo.setValue
 
 object StarshipComputers : SLComponent() {
@@ -79,7 +78,7 @@ object StarshipComputers : SLComponent() {
 		}
 
 		event.isCancelled = true
-		val data: PlayerStarshipData? = StarshipComputers[event.player.world, block.x, block.y, block.z]
+		val data: StarshipData? = StarshipComputers[event.player.world, block.x, block.y, block.z]
 
 		when (event.action) {
 			Action.LEFT_CLICK_BLOCK -> handleLeftClick(data, player, block)
@@ -88,7 +87,7 @@ object StarshipComputers : SLComponent() {
 		}
 	}
 
-	private fun handleLeftClick(data: PlayerStarshipData?, player: Player, block: Block) {
+	private fun handleLeftClick(data: StarshipData?, player: Player, block: Block) {
 		if (data == null) {
 			createComputer(player, block)
 			return
@@ -97,7 +96,7 @@ object StarshipComputers : SLComponent() {
 		tryOpenMenu(player, data)
 	}
 
-	private fun handleRightClick(data: PlayerStarshipData?, player: Player) {
+	private fun handleRightClick(data: StarshipData?, player: Player) {
 		if (data == null) {
 			return
 		}
@@ -109,7 +108,7 @@ object StarshipComputers : SLComponent() {
 	fun onBlockBreak(event: BlockBreakEvent) {
 		val block = event.block
 		// get a DEACTIVATED computer. Using StarshipComputers#get would include activated ones
-		val computer: PlayerStarshipData = DeactivatedPlayerStarships[block.world, block.x, block.y, block.z]
+		val computer: StarshipData = DeactivatedPlayerStarships[block.world, block.x, block.y, block.z]
 			?: return
 		val player = event.player
 		DeactivatedPlayerStarships.destroyAsync(computer) {
@@ -117,7 +116,7 @@ object StarshipComputers : SLComponent() {
 		}
 	}
 
-	operator fun get(world: World, x: Int, y: Int, z: Int): PlayerStarshipData? {
+	operator fun get(world: World, x: Int, y: Int, z: Int): StarshipData? {
 		return ActiveStarships.getByComputerLocation(world, x, y, z) ?: DeactivatedPlayerStarships[world, x, y, z]
 	}
 
@@ -131,7 +130,7 @@ object StarshipComputers : SLComponent() {
 		}
 	}
 
-	private fun tryOpenMenu(player: Player, data: PlayerStarshipData) {
+	private fun tryOpenMenu(player: Player, data: StarshipData) {
 		if (!data.isPilot(player) && !player.hasPermission("ion.core.starship.override") && !player.isTerritoryOwner()) {
 			Tasks.async {
 				val name: String? = SLPlayer.getName(data.captain)
@@ -208,11 +207,11 @@ object StarshipComputers : SLComponent() {
 		}
 	}
 
-	private val lockMap = mutableMapOf<Oid<PlayerStarshipData>, Any>()
+	private val lockMap = mutableMapOf<Oid<StarshipData>, Any>()
 
-	private fun getLock(dataId: Oid<PlayerStarshipData>): Any = lockMap.getOrPut(dataId) { Any() }
+	private fun getLock(dataId: Oid<StarshipData>): Any = lockMap.getOrPut(dataId) { Any() }
 
-	private fun tryReDetect(player: Player, data: PlayerStarshipData) {
+	private fun tryReDetect(player: Player, data: StarshipData) {
 		Tasks.async {
 			synchronized(getLock(data._id)) {
 				val state = try {
@@ -236,7 +235,7 @@ object StarshipComputers : SLComponent() {
 		}
 	}
 
-	private fun openPilotsMenu(player: Player, data: PlayerStarshipData) {
+	private fun openPilotsMenu(player: Player, data: StarshipData) {
 		MenuHelper.apply {
 			val items = LinkedList<GuiItem>()
 			items.add(
@@ -259,9 +258,9 @@ object StarshipComputers : SLComponent() {
 											} else {
 												DeactivatedPlayerStarships.addPilot(data, id)
 												data.pilots += id
-												PlayerStarshipData.updateById(
+												StarshipData.updateById(
 													data._id,
-													addToSet(PlayerStarshipData::pilots, id)
+													addToSet(StarshipData::pilots, id)
 												)
 												player.success("Added $input as a pilot to starship.")
 											}
@@ -282,7 +281,7 @@ object StarshipComputers : SLComponent() {
 							if (pilot != data.captain) {
 								data.pilots -= pilot
 								Tasks.async {
-									PlayerStarshipData.updateById(data._id, pull(PlayerStarshipData::pilots, pilot))
+									StarshipData.updateById(data._id, pull(StarshipData::pilots, pilot))
 								}
 								player.closeInventory()
 								player.success("Removed $name")
@@ -297,7 +296,7 @@ object StarshipComputers : SLComponent() {
 		}
 	}
 
-	private fun startRename(player: Player, data: PlayerStarshipData) {
+	private fun startRename(player: Player, data: StarshipData) {
 		player.closeInventory()
 		player.beginConversation(
 			Conversation(
@@ -373,7 +372,7 @@ object StarshipComputers : SLComponent() {
 		)
 	}
 
-	private fun openTypeMenu(player: Player, data: PlayerStarshipData) {
+	private fun openTypeMenu(player: Player, data: StarshipData) {
 		MenuHelper.apply {
 			val items = StarshipType.getUnlockedTypes(player).map { type ->
 				guiButton(type.menuItem) {
@@ -392,7 +391,7 @@ object StarshipComputers : SLComponent() {
 		}
 	}
 
-	private fun toggleLockEnabled(player: Player, data: PlayerStarshipData) {
+	private fun toggleLockEnabled(player: Player, data: StarshipData) {
 		val newValue = !data.isLockEnabled
 
 		DeactivatedPlayerStarships.updateLockEnabled(data, newValue)
@@ -404,9 +403,9 @@ object StarshipComputers : SLComponent() {
 		}
 	}
 
-	private fun takeOwnership(player: Player, data: PlayerStarshipData) {
-		PlayerStarshipData.updateById(data._id, setValue(PlayerStarshipData::captain, player.slPlayerId))
-		PlayerStarshipData.updateById(data._id, setValue(PlayerStarshipData::pilots, mutableSetOf()))
+	private fun takeOwnership(player: Player, data: StarshipData) {
+		StarshipData.updateById(data._id, setValue(StarshipData::captain, player.slPlayerId))
+		StarshipData.updateById(data._id, setValue(StarshipData::pilots, mutableSetOf()))
 	}
 
 	fun Player.isTerritoryOwner(): Boolean {

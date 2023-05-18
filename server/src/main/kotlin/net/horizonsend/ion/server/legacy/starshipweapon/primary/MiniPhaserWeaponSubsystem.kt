@@ -1,8 +1,8 @@
 package net.horizonsend.ion.server.legacy.starshipweapon.primary
 
 import net.horizonsend.ion.server.IonServer
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.horizonsend.ion.server.legacy.starshipweapon.projectile.MiniPhaserProjectile
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.subsystem.weapon.CannonWeaponSubsystem
 import net.starlegacy.feature.starship.subsystem.weapon.interfaces.AmmoConsumingWeaponSubsystem
@@ -31,7 +31,7 @@ class MiniPhaserWeaponSubsystem(
 	override fun isAcceptableDirection(face: BlockFace) = true
 
 	override fun canFire(dir: Vector, target: Vector): Boolean {
-		return starship is ActivePlayerStarship && starship.pilot!!.hasPermission("ioncore.eventweapon") && super.canFire(
+		return starship is ActiveEntityStarship && starship.pilot!!.hasPermission("ioncore.eventweapon") && super.canFire(
 			dir,
 			target
 		)

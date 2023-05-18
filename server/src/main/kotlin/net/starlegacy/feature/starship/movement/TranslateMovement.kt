@@ -15,7 +15,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class TranslateMovement(starship: ActiveStarship, val dx: Int, val dy: Int, val dz: Int, newWorld: World? = null) :
-	StarshipMovement(starship, newWorld) {
+	StarshipMovement<Any?>(starship, newWorld) {
 	companion object {
 		fun loadChunksAndMove(
 			starship: ActiveStarship,

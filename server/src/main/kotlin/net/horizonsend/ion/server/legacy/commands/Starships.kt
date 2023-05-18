@@ -5,7 +5,7 @@ import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.Default
 import net.horizonsend.ion.server.IonServer
 import net.starlegacy.database.schema.misc.SLPlayer
-import net.starlegacy.database.schema.starships.PlayerStarshipData
+import net.horizonsend.ion.server.database.schema.starships.StarshipData
 import net.starlegacy.database.slPlayerId
 import net.starlegacy.util.blockKeyX
 import net.starlegacy.util.blockKeyY
@@ -20,12 +20,12 @@ internal class Starships : BaseCommand() {
 	@Default
 	fun starships(sender: Player) {
 		sender.sendRichMessage(
-			PlayerStarshipData.find(
+			StarshipData.find(
 				and(
-					PlayerStarshipData::captain eq sender.slPlayerId,
+					StarshipData::captain eq sender.slPlayerId,
 					or(
-						PlayerStarshipData::serverName eq null,
-						PlayerStarshipData::serverName eq IonServer.configuration.serverName
+						StarshipData::serverName eq null,
+						StarshipData::serverName eq IonServer.configuration.serverName
 					)
 				)
 			).joinToString("\n", "<bold>Starships:</bold><gray>\n") {

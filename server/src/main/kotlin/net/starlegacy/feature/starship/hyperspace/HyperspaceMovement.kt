@@ -5,7 +5,7 @@ import net.horizonsend.ion.common.extensions.alertAction
 import net.horizonsend.ion.common.extensions.informationAction
 import net.horizonsend.ion.server.IonServer
 import net.horizonsend.ion.server.features.achievements.rewardAchievement
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.active.ActiveStarships
 import net.starlegacy.util.distance
@@ -43,7 +43,7 @@ class HyperspaceMovement(
 			cancel()
 			return
 		}
-		(ship as? ActivePlayerStarship)?.pilot?.rewardAchievement(Achievement.USE_HYPERSPACE)
+		(ship as? ActiveEntityStarship)?.pilot?.rewardAchievement(Achievement.USE_HYPERSPACE)
 
 		x += direction.x * speed
 		z += direction.z * speed

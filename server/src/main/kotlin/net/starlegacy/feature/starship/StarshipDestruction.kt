@@ -4,9 +4,9 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.longs.LongIterator
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import net.horizonsend.ion.server.IonServer
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.minecraft.world.level.block.state.BlockState
 import net.starlegacy.feature.space.SpaceWorlds
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.active.ActiveStarshipMechanics
 import net.starlegacy.feature.starship.event.StarshipExplodeEvent
@@ -36,7 +36,7 @@ object StarshipDestruction {
 
 		starship.isExploding = true
 
-		if (starship is ActivePlayerStarship) {
+		if (starship is ActiveEntityStarship) {
 			DeactivatedPlayerStarships.deactivateAsync(starship) {
 				DeactivatedPlayerStarships.destroyAsync(starship.data) {
 					vanishShip(starship)
@@ -64,7 +64,7 @@ object StarshipDestruction {
 
 		starship.isExploding = true
 
-		if (starship is ActivePlayerStarship) {
+		if (starship is ActiveEntityStarship) {
 			DeactivatedPlayerStarships.deactivateAsync(starship) {
 				DeactivatedPlayerStarships.destroyAsync(starship.data) {
 					destroyShip(starship)

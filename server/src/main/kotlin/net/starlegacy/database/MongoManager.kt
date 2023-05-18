@@ -30,7 +30,7 @@ import net.starlegacy.database.schema.nations.Territory
 import net.starlegacy.database.schema.space.Planet
 import net.starlegacy.database.schema.space.Star
 import net.starlegacy.database.schema.starships.Blueprint
-import net.starlegacy.database.schema.starships.PlayerStarshipData
+import net.horizonsend.ion.server.database.schema.starships.StarshipData
 import net.starlegacy.util.Tasks
 import org.bson.BsonDocument
 import org.bson.BsonDocumentReader
@@ -105,7 +105,7 @@ object MongoManager : SLComponent() {
 		BazaarItem.init()
 
 		// starships
-		PlayerStarshipData.init()
+		StarshipData.init()
 		Blueprint.init()
 	}
 

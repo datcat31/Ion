@@ -1,8 +1,8 @@
 package net.horizonsend.ion.server.legacy.starshipweapon.primary
 
 import net.horizonsend.ion.server.IonServer
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.horizonsend.ion.server.legacy.starshipweapon.projectile.CthulhuBeamProjectile
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.subsystem.DirectionalSubsystem
 import net.starlegacy.feature.starship.subsystem.weapon.WeaponSubsystem
@@ -59,7 +59,7 @@ class CthulhuBeamSubsystem(starship: ActiveStarship, pos: Vec3i, override var fa
 	override fun autoFire(target: Player, dir: Vector) {
 		lastFire = System.nanoTime()
 
-		val shooter = (starship as? ActivePlayerStarship)?.pilot
+		val shooter = (starship as? ActiveEntityStarship)?.pilot
 		val loc = getFirePos().toCenterVector().toLocation(target.world)
 		CthulhuBeamProjectile(starship, loc, dir, shooter).fire()
 	}

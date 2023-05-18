@@ -1,6 +1,7 @@
 package net.starlegacy.feature.starship.active
 
 import net.horizonsend.ion.server.IonServer
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.starlegacy.SLComponent
 import net.starlegacy.feature.starship.DeactivatedPlayerStarships
 import net.starlegacy.feature.starship.PilotedStarships
@@ -254,7 +255,7 @@ object ActiveStarshipMechanics : SLComponent() {
 		}
 	}
 
-	private fun updateDynmapVisibility(player: Player, starship: ActivePlayerStarship?) {
+	private fun updateDynmapVisibility(player: Player, starship: ActiveEntityStarship?) {
 		if (!getPluginManager().isPluginEnabled("dynmap")) return
 
 		val isNoStarship = starship == null
@@ -263,7 +264,7 @@ object ActiveStarshipMechanics : SLComponent() {
 		DynmapPlugin.plugin.assertPlayerInvisibility(player, isInvisible, IonServer)
 	}
 
-	private fun updateGlowing(player: Player, starship: ActivePlayerStarship?) {
+	private fun updateGlowing(player: Player, starship: ActiveEntityStarship?) {
 		val shouldGlow = starship != null
 		if (player.isGlowing != shouldGlow) {
 			player.isGlowing = shouldGlow

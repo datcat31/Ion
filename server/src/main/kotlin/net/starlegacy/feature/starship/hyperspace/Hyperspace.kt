@@ -5,13 +5,13 @@ import net.horizonsend.ion.common.extensions.serverError
 import net.horizonsend.ion.common.extensions.userError
 import net.horizonsend.ion.common.extensions.userErrorAction
 import net.horizonsend.ion.server.features.achievements.rewardAchievement
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.sound.Sound
 import net.starlegacy.SLComponent
 import net.starlegacy.feature.space.Space
 import net.starlegacy.feature.space.SpaceWorlds
 import net.starlegacy.feature.starship.StarshipType.PLATFORM
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.active.ActiveStarships
 import net.starlegacy.feature.starship.event.StarshipActivatedEvent
@@ -92,7 +92,7 @@ object Hyperspace : SLComponent() {
 			HyperspaceMap.addMarker(starship, marker)
 		}
 
-		(starship as? ActivePlayerStarship)?.pilot?.rewardAchievement(Achievement.USE_HYPERSPACE)
+		(starship as? ActiveEntityStarship)?.pilot?.rewardAchievement(Achievement.USE_HYPERSPACE)
 	}
 
 	fun cancelJumpWarmup(warmup: HyperspaceWarmup) {
@@ -318,7 +318,7 @@ object Hyperspace : SLComponent() {
 		onStarshipMove(event)
 	}
 
-	fun getHyperspaceMovement(ship: ActivePlayerStarship): HyperspaceMovement? {
+	fun getHyperspaceMovement(ship: ActiveEntityStarship): HyperspaceMovement? {
 		return movementTasks[ship]
 	}
 }

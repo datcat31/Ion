@@ -12,6 +12,8 @@ import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldedit.world.block.BlockState
 import net.horizonsend.ion.common.extensions.success
 import net.horizonsend.ion.common.extensions.userError
+import net.horizonsend.ion.server.features.starship.Starship
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.horizonsend.ion.server.legacy.ShipFactoryMaterialCosts
 import net.minecraft.world.level.block.BaseEntityBlock
 import net.starlegacy.cache.nations.NationCache
@@ -26,7 +28,7 @@ import net.starlegacy.feature.starship.StarshipComputers
 import net.starlegacy.feature.starship.StarshipDetection
 import net.starlegacy.feature.starship.StarshipSchematic
 import net.starlegacy.feature.starship.StarshipType
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
+import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.factory.PrintItem
 import net.starlegacy.feature.starship.factory.StarshipFactories
 import net.starlegacy.util.MenuHelper
@@ -214,7 +216,7 @@ object BlueprintCommand : SLCommand() {
 			checkObstruction(sender, schematic, pilotLoc)
 
 			loadSchematic(sender, schematic, pilotLoc) { origin ->
-				tryPilot(sender, origin, blueprint.type, blueprint.name) { starship ->
+				tryPilot(sender, origin, blueprint.type, blueprint.name) { starship: ActiveStarship ->
 
 					starship.iterateBlocks { x, y, z ->
 						val block = starship.serverLevel.world.getBlockAt(x, y, z)
@@ -264,7 +266,7 @@ object BlueprintCommand : SLCommand() {
 		origin: Vec3i,
 		type: StarshipType,
 		name: String,
-		callback: (ActivePlayerStarship) -> Unit = {}
+		callback: (ActiveEntityStarship) -> Unit = {}
 	) {
 		val block = sender.world.getBlockAtKey(origin.toBlockKey())
 

@@ -1,7 +1,7 @@
 package net.starlegacy.feature.starship.hyperspace
 
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.starlegacy.feature.space.Space
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarships
 import net.starlegacy.util.distanceSquared
 import net.starlegacy.util.squared
@@ -57,7 +57,7 @@ object MassShadows {
 				continue
 			}
 			dist = sqrt(dist)
-			val interdictingShip = otherShip as? ActivePlayerStarship
+			val interdictingShip = otherShip as? ActiveEntityStarship
 			val interdictingShipName = interdictingShip?.data?.name ?: otherShip.type
 			val interdictingShipPilot = interdictingShip?.pilot?.name ?: "none"
 			return MassShadowInfo(

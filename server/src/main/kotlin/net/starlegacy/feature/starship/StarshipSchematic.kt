@@ -7,7 +7,7 @@ import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter
 import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldedit.regions.CuboidRegion
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.util.Vec3i
 import java.io.ByteArrayInputStream
@@ -23,7 +23,7 @@ object StarshipSchematic {
 		val region = CuboidRegion(min, max)
 		val clipboard = BlockArrayClipboard(region)
 
-		val origin = if (starship is ActivePlayerStarship) Vec3i(starship.data.blockKey) else starship.centerOfMassVec3i
+		val origin = if (starship is ActiveEntityStarship) Vec3i(starship.data.blockKey) else starship.centerOfMassVec3i
 		clipboard.origin = BlockVector3.at(origin.x, origin.y, origin.z)
 		val weWorld: WEWorld = BukkitAdapter.adapt(starship.serverLevel.world)
 		starship.iterateBlocks { x, y, z ->

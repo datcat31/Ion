@@ -2,8 +2,8 @@ package net.starlegacy.feature.starship
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
+import net.horizonsend.ion.server.database.schema.starships.StarshipData
 import net.starlegacy.SLComponent
-import net.starlegacy.database.schema.starships.PlayerStarshipData
 import net.starlegacy.listen
 import net.starlegacy.util.Vec3i
 import net.starlegacy.util.blockKey
@@ -51,7 +51,7 @@ object StarshipDetection : SLComponent() {
 	}
 	//endregion
 
-	fun detectNewState(data: PlayerStarshipData): PlayerStarshipState {
+	fun detectNewState(data: StarshipData): PlayerStarshipState {
 		val world = data.bukkitWorld()
 		/*
 						val forbiddenBlocks = ForbiddenBlocks.getForbiddenBlocks(world)

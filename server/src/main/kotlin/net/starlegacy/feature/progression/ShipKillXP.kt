@@ -9,6 +9,7 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel
 import net.horizonsend.ion.common.database.enums.Achievement
 import net.horizonsend.ion.common.extensions.Colors
 import net.horizonsend.ion.server.features.achievements.rewardAchievement
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
@@ -21,7 +22,6 @@ import net.starlegacy.feature.misc.CombatNPCKillEvent
 import net.starlegacy.feature.starship.PilotedStarships.getDisplayNameComponent
 import net.starlegacy.feature.starship.PilotedStarships.getRawDisplayName
 import net.starlegacy.feature.starship.StarshipType
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.active.ActiveStarships
 import net.starlegacy.feature.starship.event.StarshipExplodeEvent
@@ -59,7 +59,7 @@ object ShipKillXP : SLComponent() {
 		val map = starship.damagers
 		val size = starship.initialBlockCount
 		val type = starship.type
-		val name = (starship as ActivePlayerStarship).data.name
+		val name = (starship as ActiveEntityStarship).data.name
 		return ShipDamageData(map, size, type, name)
 	}
 
@@ -193,7 +193,7 @@ object ShipKillXP : SLComponent() {
 		val killerShip = ActiveStarships.findByPassenger(getPlayer(killer.id)!!)!!
 
 		val killerShipName =
-			(killerShip as? ActivePlayerStarship)?.let { getDisplayNameComponent(it.data) }
+			(killerShip as? ActiveEntityStarship)?.let { getDisplayNameComponent(it.data) }
 				?: Component.text("a ").color(alertFeedbackColor).append(killerShip.type.component)
 
 		val killerNationColor = SLPlayer[getPlayer(killer.id)!!].nation?.let {
@@ -240,7 +240,7 @@ object ShipKillXP : SLComponent() {
 						nationID ->
 					Nation.findById(nationID)?.color
 				} ?: 16777215 // white
-				val assistShipName = (assistShip as? ActivePlayerStarship)?.let { getDisplayNameComponent(it.data) }
+				val assistShipName = (assistShip as? ActiveEntityStarship)?.let { getDisplayNameComponent(it.data) }
 				val assistHoverEvent = Component.text()
 					.append(Component.text(assistShip.initialBlockCount).color(NamedTextColor.WHITE))
 					.append(Component.text(" block ").color(NamedTextColor.GRAY))
@@ -281,7 +281,7 @@ object ShipKillXP : SLComponent() {
 
 				// Formatting the messages
 				val killedShipDiscordName = data.name?.let { it.replace("<[^>]*>".toRegex(), "") + ", a" } ?: " a"
-				val killerShipDiscordName = (killerShip as? ActivePlayerStarship)?.data?.name?.let {
+				val killerShipDiscordName = (killerShip as? ActiveEntityStarship)?.data?.name?.let {
 					it.replace("<[^>]*>".toRegex(), "") + ", a"
 				} ?: " a"
 

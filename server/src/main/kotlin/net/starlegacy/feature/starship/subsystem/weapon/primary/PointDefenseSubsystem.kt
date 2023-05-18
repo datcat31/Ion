@@ -1,7 +1,7 @@
 package net.starlegacy.feature.starship.subsystem.weapon.primary
 
 import net.horizonsend.ion.server.IonServer
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.subsystem.DirectionalSubsystem
 import net.starlegacy.feature.starship.subsystem.weapon.WeaponSubsystem
@@ -59,7 +59,7 @@ class PointDefenseSubsystem(starship: ActiveStarship, pos: Vec3i, override var f
 	override fun autoFire(target: Player, dir: Vector) {
 		lastFire = System.nanoTime()
 
-		val shooter = (starship as? ActivePlayerStarship)?.pilot
+		val shooter = (starship as? ActiveEntityStarship)?.pilot
 		val loc = getFirePos().toCenterVector().toLocation(target.world)
 		PointDefenseLaserProjectile(starship, loc, dir, range, shooter).fire()
 	}

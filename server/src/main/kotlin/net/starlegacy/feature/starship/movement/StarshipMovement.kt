@@ -2,25 +2,20 @@ package net.starlegacy.feature.starship.movement
 
 import co.aikar.commands.ConditionFailedException
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
+import net.horizonsend.ion.server.database.schema.starships.StarshipData
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.horizonsend.ion.server.legacy.events.EnterPlanetEvent
 import net.horizonsend.ion.server.miscellaneous.minecraft
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.state.BlockState
-import net.starlegacy.database.schema.starships.PlayerStarshipData
 import net.starlegacy.feature.misc.CryoPods
 import net.starlegacy.feature.space.CachedPlanet
 import net.starlegacy.feature.space.Space
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarship
 import net.starlegacy.feature.starship.active.ActiveStarships
 import net.starlegacy.feature.starship.isFlyable
 import net.starlegacy.feature.starship.subsystem.CryoSubsystem
-import net.starlegacy.util.Vec3i
-import net.starlegacy.util.blockKey
-import net.starlegacy.util.blockKeyX
-import net.starlegacy.util.blockKeyY
-import net.starlegacy.util.blockKeyZ
-import net.starlegacy.util.nms
+import net.starlegacy.util.*
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.entity.Animals
@@ -31,9 +26,10 @@ import org.bukkit.util.Vector
 import kotlin.collections.set
 import kotlin.math.sqrt
 
-abstract class StarshipMovement(val starship: ActiveStarship, val newWorld: World? = null) {
+abstract class StarshipMovement<T>(val starship: ActiveStarship, val newWorld: World? = null) {
+
 	// null if the ship is not a player ship
-	private val playerShip: ActivePlayerStarship? = starship as? ActivePlayerStarship
+	private val entityShip: ActiveEntityStarship? = starship as? ActiveEntityStarship
 
 	protected abstract fun displaceX(oldX: Int, oldZ: Int): Int
 	protected abstract fun displaceY(oldY: Int): Int
@@ -62,7 +58,7 @@ abstract class StarshipMovement(val starship: ActiveStarship, val newWorld: Worl
 		}
 
 		if (displaceY(starship.max.y) >= world1.maxHeight) {
-			if (playerShip != null && exitPlanet(world1, playerShip)) {
+			if (entityShip != null && exitPlanet(world1, entityShip)) {
 				starship.sendMessage("&7Exiting planet")
 				return
 			}
@@ -117,7 +113,7 @@ abstract class StarshipMovement(val starship: ActiveStarship, val newWorld: Worl
 			onComplete()
 		}
 		if (world1 != world2 && !world2.toString().contains("hyperspace")) {
-			EnterPlanetEvent(world1, world2, (starship as? ActivePlayerStarship)!!.pilot!!).callEvent()
+			EnterPlanetEvent(world1, world2, (starship as? ActiveEntityStarship)!!.pilot!!).callEvent()
 		}
 	}
 
@@ -190,33 +186,33 @@ abstract class StarshipMovement(val starship: ActiveStarship, val newWorld: Worl
 	}
 
 	private fun moveSelfComputer(world2: World) {
-		if (playerShip == null) {
+		if (entityShip == null) {
 			return
 		}
 
-		val data = playerShip.data
+		val data = entityShip.data
 		ActiveStarships.updateLocation(data, world2, displacedKey(data.blockKey))
 	}
 
 	private fun moveCarriedShipComputers(world2: World) {
-		if (playerShip == null) {
+		if (entityShip == null) {
 			return
 		}
 
-		for (data: PlayerStarshipData in playerShip.carriedShips.keys) {
+		for (data: StarshipData in entityShip.carriedShips.keys) {
 			data.blockKey = displacedKey(data.blockKey)
 			data.levelName = world2.name
 
-			val blocks = playerShip.carriedShips[data] ?: continue // the rest is only for the carried ships
-			playerShip.carriedShips[data] = blocks.mapTo(LongOpenHashSet(blocks.size)) { key: Long ->
+			val blocks = entityShip.carriedShips[data] ?: continue // the rest is only for the carried ships
+			entityShip.carriedShips[data] = blocks.mapTo(LongOpenHashSet(blocks.size)) { key: Long ->
 				displacedKey(key)
 			}
 		}
 	}
 
 	private fun updateDirectControlCenter() {
-		val directControlCenter = playerShip?.directControlCenter ?: return
-		playerShip.directControlCenter = displaceLocation(directControlCenter)
+		val directControlCenter = entityShip?.directControlCenter ?: return
+		entityShip.directControlCenter = displaceLocation(directControlCenter)
 	}
 
 	private fun updateCenter() {
@@ -242,7 +238,7 @@ abstract class StarshipMovement(val starship: ActiveStarship, val newWorld: Worl
 		}
 	}
 
-	private fun exitPlanet(world: World, starship: ActivePlayerStarship): Boolean {
+	private fun exitPlanet(world: World, starship: ActiveEntityStarship): Boolean {
 		val planet: CachedPlanet = Space.getPlanet(world) ?: return false
 		val pilot: Player = starship.pilot ?: return false
 		val direction: Vector = pilot.location.direction
@@ -271,4 +267,5 @@ abstract class StarshipMovement(val starship: ActiveStarship, val newWorld: Worl
 			movePassenger(passenger)
 		}
 	}
+
 }

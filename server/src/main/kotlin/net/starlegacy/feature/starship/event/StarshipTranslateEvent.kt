@@ -1,13 +1,13 @@
 package net.starlegacy.feature.starship.event
 
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.starlegacy.feature.starship.movement.TranslateMovement
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import org.bukkit.event.HandlerList
 
 class StarshipTranslateEvent(
-	ship: ActivePlayerStarship,
+	ship: ActiveEntityStarship,
 	player: Player,
 	override val movement: TranslateMovement
 ) : StarshipMoveEvent(ship, player, movement), Cancellable {

@@ -1,7 +1,7 @@
 package net.starlegacy.feature.starship.control
 
+import net.horizonsend.ion.server.features.starship.active.ActiveEntityStarship
 import net.starlegacy.feature.starship.BoardingRamps
-import net.starlegacy.feature.starship.active.ActivePlayerStarship
 import net.starlegacy.feature.starship.active.ActiveStarships
 import net.starlegacy.util.colorize
 import net.starlegacy.util.msg
@@ -58,7 +58,7 @@ enum class StarshipSigns(val undetectedText: String, val baseLines: Array<String
 			player msg "&7Took control of weapon set &b$set"
 		}
 
-		private fun informOfSteal(current: UUID, starship: ActivePlayerStarship, player: Player, set: String) {
+		private fun informOfSteal(current: UUID, starship: ActiveEntityStarship, player: Player, set: String) {
 			// only message if the player is still online
 			val currentPlayer = Bukkit.getPlayer(current)
 			if (currentPlayer != null && starship.isPassenger(current)) {
@@ -130,8 +130,8 @@ enum class StarshipSigns(val undetectedText: String, val baseLines: Array<String
 
 	open fun onClick(player: Player, sign: Sign, rightClick: Boolean) {}
 
-	protected fun findPlayerStarship(player: Player): ActivePlayerStarship? {
-		val activeStarship = ActiveStarships.findByPassenger(player) as? ActivePlayerStarship
+	protected fun findPlayerStarship(player: Player): ActiveEntityStarship? {
+		val activeStarship = ActiveStarships.findByPassenger(player) as? ActiveEntityStarship
 
 		if (activeStarship == null) {
 			player msg "&cYou can only use this in an active player starship"
@@ -141,8 +141,8 @@ enum class StarshipSigns(val undetectedText: String, val baseLines: Array<String
 		return activeStarship
 	}
 
-	protected fun findPilotedPlayerStarship(player: Player): ActivePlayerStarship? {
-		val starship = ActiveStarships.findByPassenger(player) as? ActivePlayerStarship
+	protected fun findPilotedPlayerStarship(player: Player): ActiveEntityStarship? {
+		val starship = ActiveStarships.findByPassenger(player) as? ActiveEntityStarship
 
 		if (starship == null) {
 			player msg "&cYou can only use this in an active player starship"
