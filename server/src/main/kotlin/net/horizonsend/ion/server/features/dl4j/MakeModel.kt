@@ -19,9 +19,9 @@ import kotlin.random.Random
 class MakeModel {
 
 	final val seed = 12345
-	final val nEpochs = 200
-	final val nSamples = 5000
-	final val batchSize = 100
+	final val nEpochs = 1000000
+	final val nSamples = 1000000
+	final val batchSize = 1
 	final val learningRate = 0.01
 	private val rng: Random = Random(seed)
 
@@ -29,8 +29,8 @@ class MakeModel {
 		val iterator: DataSetIterator = compute(batchSize, rng)
 
 		val numInput = 6
-		val numOutputs = 1
-		val nHidden = 10
+		val numOutputs = 8
+		val nHidden = 300
 		val net = MultiLayerNetwork(
 			NeuralNetConfiguration.Builder()
 				.seed(seed.toLong())
@@ -83,13 +83,21 @@ class MakeModel {
 		println(out)
 	}
 	private fun compute(batchSize: Int, rand: Random): DataSetIterator {
-		val sum = DoubleArray(nSamples)
 		val dx = DoubleArray(nSamples)
 		val dy = DoubleArray(nSamples)
 		val dz = DoubleArray(nSamples)
 		val world = DoubleArray(nSamples)
 		val AIShipType = DoubleArray(nSamples)
 		val weaponRange = DoubleArray(nSamples)
+		var arrayOut = IntArray(10)
+		val mx = IntArray(nSamples)
+		val my = IntArray(nSamples)
+		val mz = IntArray(nSamples)
+		val mb = IntArray(nSamples)
+		val sb = IntArray(nSamples)
+		val sx = IntArray(nSamples)
+		val sy = IntArray(nSamples)
+		val sz = IntArray(nSamples)
 		for (i in 0 until nSamples) {
 			dx[i] = rand.nextDouble(1000.0)
 			dy[i] = rand.nextDouble(1000.0)
@@ -98,21 +106,36 @@ class MakeModel {
 			AIShipType[i] = rand.nextInt(16).toDouble()
 			weaponRange[i] = rand.nextInt(100,500).toDouble()
 
-			sum[i] = 0.0
+			arrayOut = modelFun(dx[i],dy[i],dz[i],world[i],AIShipType[i],weaponRange[i])
+			mx[i] = arrayOut[1]
+			my[i] = arrayOut[2]
 		}
 		val dxArray = Nd4j.create(dx, nSamples.toLong(), 1)
 		val dyArray = Nd4j.create(dy, nSamples.toLong(), 1)
 		val dzArray = Nd4j.create(dz, nSamples.toLong(), 1)
 		val worldArray = Nd4j.create(world, nSamples.toLong(), 1)
-		val shipTypeArray = Nd4j.create(world, nSamples.toLong(), 1)
-		val weaponRangeArray = Nd4j.create(world, nSamples.toLong(), 1)
-
+		val shipTypeArray = Nd4j.create(AIShipType, nSamples.toLong(), 1)
+		val weaponRangeArray = Nd4j.create(weaponRange, nSamples.toLong(), 1)
 		val inputNDArray = Nd4j.hstack(dxArray, dyArray, dzArray, worldArray, shipTypeArray, weaponRangeArray)
+		val mxArray = Nd4j.create(mx,mx)
+		val myArray = Nd4j.create(my,my)
+		val mzArray = Nd4j.create(mz,mz)
+		val mbArray = Nd4j.create(mb,mb)
+		val sxArray = Nd4j.create(sx,sx)
+		val syArray = Nd4j.create(sy,sy)
+		val szArray = Nd4j.create(sz,sz)
+		val sbArray = Nd4j.create(sb,sb)
 
-		val outPut = Nd4j.create(sum, nSamples.toLong(), 1)
+		val outPut = Nd4j.hstack(mxArray,myArray,mzArray,mbArray,sxArray,syArray,szArray,sbArray)
 		val dataSet = DataSet(inputNDArray, outPut)
 		val listDs = dataSet.asList()
 		listDs.shuffle(rng)
 		return ListDataSetIterator(listDs, batchSize)
+	}
+
+	fun modelFun(x :Double, y :Double, z :Double, w :Double, st :Double, wR :Double): IntArray {
+		val valout: IntArray = IntArray(10)
+		valout[1] = 2
+		return valout
 	}
 }
